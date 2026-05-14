@@ -1,17 +1,32 @@
 import argparse
 import json
 
-tasks = {}
+
 parser = argparse.ArgumentParser(description='Test')
-parser.add_argument('-a','--add', type=str, help='Adds a task', nargs='+')
-parser.add_argument('-u','--update', type=str, help='Updates a task', nargs='+')
-parser.add_argument('-d','--delete', type=str, help='Deletes a task', nargs='+')
+parser.add_argument('-a','--add', type=str, help='Adds a task', nargs= 3)
+parser.add_argument('-u','--update', type=str, help='Updates a task', nargs= 2)
+parser.add_argument('-d','--delete', type=str, help='Deletes a task', nargs= 1)
 args = parser.parse_args()
 
-print(args.add)
+try:
+    with open("tasks.json", "r") as infile:
+            tasks = json.load(infile) 
+except:
+    tasks = { 0: {
+                'status' : {},
+                "description": {},
+                'created_at': {} 
+    }
+             
+            }
+
+if tasks:
+    tasks_id = max(int(i) for i in tasks.keys()) + 1
+else:
+    tasks_id = 1
 
 def Add():
-    tasks_id = 1
+    global tasks_id
     details = args.add
     tasks[tasks_id] = {
         'status' : details[0],
@@ -20,12 +35,27 @@ def Add():
     }
     with open("tasks.json", "w") as outfile:
         json.dump(tasks, outfile)  
+
     tasks_id += 1
+    
+
+def Update():
+    global tasks_id
+    details = args.update
+    task_id = details[0]
+    tasks[task_id]["description"] = details[1]
+    with open("tasks.json", "w") as outfile:
+        json.dump(tasks, outfile)
+
+def Delete():
+    None
 
 if args.add:
     Add()
-else:
-    None
+elif args.update:
+    Update()
+elif args.delete:
+    Delete()
 
 # tasks = {}
 
